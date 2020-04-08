@@ -1,11 +1,11 @@
 from __future__ import print_function
 import os
 
-path = 'Downloads/gen/letters/'
+path = '/home/abhinandan/Downloads/gen/letters/'
 
 files = os.listdir(path)
-i = 6220
+i = 7000
 for name in files:
     if str(i)+'.jpg' != name:
-        os.system('mv Downloads/gen/letters/'+name+' data/letters/'+str(i)+'.jpg')
+        os.system('mv /home/abhinandan/Downloads/gen/letters/'+name+' /home/abhinandan/data/letters/'+str(i)+'.jpg')
         i+=1

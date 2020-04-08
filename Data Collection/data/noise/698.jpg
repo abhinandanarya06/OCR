@@ -1,0 +1,11 @@
+from __future__ import print_function
+import os
+
+path = '../alpha'
+
+files = os.listdir(path)
+i = 0
+for name in files:
+    if str(i)+'.jpg' != name:
+        os.system('mv ../alpha/'+name+' ../alpha/'+str(i)+'.jpg')
+        i+=1

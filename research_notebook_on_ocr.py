@@ -38,9 +38,11 @@ clear_output()
 
 This will create a data directory. The hierarchy of this directory as shown below:
 
-          data --+-> letters --+--> a
-                 +-> noise     +--> b
-                 +-> number    ......
+          data --+--> a
+                 +--> b
+                 :
+                 :
+                 +--> noise
 """
 
 !unzip data.zip
@@ -52,7 +54,7 @@ clear_output()
 ---
 
 
-"imshow(image)" where image is np.array type representing image to show.
+"***imshow(image)***" function show image given as parameter
 """
 
 def imshow(image):
@@ -109,7 +111,8 @@ Layer Sequence (Sequencial Model) :
 1.   Conv2D Layer
 2.   Flatten Operation
 3.   Dense Layer with 200 units
-4.   Dense Layer with 41 units
+4.   10% neuron Dropout Operation
+5.   Dense Layer with 41 units
 """
 
 model = tf.keras.Sequential([
@@ -117,7 +120,7 @@ model = tf.keras.Sequential([
     tf.keras.layers.Flatten(),
     tf.keras.layers.Dense(200, activation = 'relu'),
     tf.keras.layers.Dropout(0.1),
-    tf.keras.layers.Dense(41)
+    tf.keras.layers.Dense(len(keywords))
 ])
 
 model.summary()
@@ -132,7 +135,7 @@ model.compile(optimizer='adam',
               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
               metrics=['accuracy'])
 
-model.fit(data_images, labels, epochs=10, callbacks = [callback])
+model.fit(data_images, labels, epochs=4, callbacks = [callback])
 clear_output()
 
 test_loss, test_acc = model.evaluate(data_images,  labels, verbose=2)
@@ -156,18 +159,6 @@ probablity = tf.keras.Sequential(
     tf.keras.layers.Softmax()
 )
 
-"""###**Creating Directory 'gen'**
-
-
----
-
-'gen' directory is created with its sub directory for storing by machine identified data
-"""
-
-!mkdir gen
-for c in keywords:
-  os.system('mkdir gen/'+c)
-
 """###**Saving the trained model**
 
 
@@ -185,14 +176,18 @@ model = tf.keras.models.load_model('model.h5')
 
 
 ---
+
+#####**Some Conventions**
 """
 
-X = 0
-Y = 1
-POS = 1
-SHAPE = 2
-W = 0
-H = 1
+X = 0   # X coordinate of the character in image space
+Y = 1   # Y coordinate of the character in image space
+POS = 1    # shows and return the (x,y) coordinate of image space
+SHAPE = 2  # shows and return the (width, height) of character contour in image space
+W = 0 # width of the character
+H = 1 # height of the character
+
+"""#####"***check_in(c, region)***" checks if character is present in the given region "*region*" of the image space"""
 
 def check_in(c, region):
     x, y, w, h = region
@@ -202,13 +197,15 @@ def check_in(c, region):
         return True
     return False
 
+"""#####"***get_region(c, regions)***" finds the region in the given list of regions "*regions*" in image space and return it"""
+
 def get_region(c, regions):
     for region in regions:
-        if check_in(char, region):
+        if check_in(c, region):
           return region
     return False
 
-"""#####***'sort_chars(line)'*** Function to sort characters in given line"""
+"""#####"***sort_chars(line)***" Function to sort characters in given line"""
 
 def sort_chars(line):
   res = list()
@@ -261,15 +258,11 @@ def group_chars_by_line(characters):
       characters.remove(m)
   return lines
 
-"""#####**Main Run Start Point**"""
+"""#####"**apply_ocr(img)**" is the function that does actual ocr operation on image parameter to get text"""
 
-imgs = [f for f in os.listdir('.') if f.endswith('.jpg')]
-img_no = 0
-for img in imgs:
-    avg_w = 0
+def apply_ocr(img):
     avg_h = 0
     character_list = list()
-    img = cv2.imread(img)
     color = img
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     img = cv2.medianBlur(img,5)
@@ -289,25 +282,17 @@ for img in imgs:
         test_data=np.array([test_data])
         cmd = np.argmax(probablity.predict(test_data))
         if cmd < 40:
-          avg_w += w
           avg_h += h
-          cv2.rectangle(img, (x,y), (x+w+w//3, y+h), 255, -1)
+          cv2.rectangle(img, (x,y), (x+w+w//4, y+h), 255, -1)
           character_list.append([keywords[cmd], (x,y), (w,h)])
           i+= 1
         #cv2.imwrite('gen/'+keywords[cmd]+'/'+str(i)+'.jpg', show)
         #i+=1
       except:
             continue
-    avg_w/=i
     avg_h/=i
     text = group_chars_by_line(character_list)#, img)
     text = sort_lines_by_yval(text)
-    print('*'*30, 'Text in image', imgs[img_no], '*'*30,'\n')
-    imshow(color)
-
-    img = cv2.blur(img,(8,1))
-    ret, img = cv2.threshold(img,254,255,cv2.THRESH_BINARY)
-    kernel = np.ones((3,10),np.uint8)
     contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
     regions = list()
     for cnt in contours:
@@ -315,6 +300,8 @@ for img in imgs:
       if region[3] <= avg_h*7:
         regions.append(region)
     del contours
+
+    TEXT = ''
     for l in text:
       char = l[0]
       region = get_region(char, regions)
@@ -322,34 +309,24 @@ for img in imgs:
         continue
       for char in l:
         if not check_in(char, region):
-          print(end=' ')
+          TEXT = TEXT + ' '
           r = get_region(char, regions)
           if not r:
             continue
           region = r
-        print(char[0], end='')
-      print()
+        TEXT = TEXT + char[0]
+      TEXT = TEXT + '\n'
+    return TEXT
+
+"""#####**Main Run Start Point**"""
+
+imgs = [f for f in os.listdir('.') if f.endswith('.jpg')]
+img_no = 0
+for img in imgs:
+    print('*'*30, 'Text on {}'.format(img), '*'*30)
+    img = cv2.imread(img)
+    TEXT = apply_ocr(img)
+    imshow(img)
+    print(TEXT)
     print('-'*80, '\n\n')
     img_no += 1
-
-"""###**Packing Generated Data for further checking by human**
-
----
-"""
-
-!tar cf gen.tar gen
-clear_output()
-
-"""###**Watching the model test results**
-
-
----
-"""
-
-for c in keywords:
-  path='gen/{}/'.format(c)
-  files = os.listdir(path)
-  for img in files[:2]:
-    img=cv2.imread(path+img,0)
-    imshow(img)
-    print(' '*10, c)

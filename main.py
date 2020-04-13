@@ -3,6 +3,7 @@ import tensorflow as tf
 from ocr_help import *
 import os
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 def imshow(image):

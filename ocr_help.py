@@ -90,9 +90,9 @@ def apply_ocr(img, text_detector):
         test_data = cv2.resize(show,(50,50),interpolation = cv2.INTER_AREA)
       except:
         continue
-        test_data=np.array([test_data])
-        cmd = np.argmax(text_detector.predict(test_data))
-        if cmd < 40:
+      test_data=np.array([test_data])
+      cmd = np.argmax(text_detector.predict(test_data))
+      if cmd < 40:
           avg_h += h
           cv2.rectangle(img, (x,y), (x+w+w//4, y+h), 255, -1)
           character_list.append([keywords[cmd], (x,y), (w,h)])

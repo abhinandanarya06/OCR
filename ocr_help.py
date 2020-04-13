@@ -2,6 +2,12 @@ import cv2
 import tensorflow as tf
 import numpy as np
 
+
+keywords = [chr(c) for c in range(ord('a'), ord('z')+1)]
+cap = ['A', 'B', 'D', 'E', 'F', 'G', 'H', 'I', 'L', 'M', 'N', 'Q', 'R', 'T']
+keywords = keywords + cap
+keywords = keywords + ['noise']
+
 X = 0
 Y = 1
 POS = 1

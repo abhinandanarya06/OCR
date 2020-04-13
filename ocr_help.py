@@ -2,19 +2,25 @@ import cv2
 import tensorflow as tf
 import numpy as np
 
-
+### FOR MAPPING BETWEEN MODEL RESULT NUMBERS AND ITS CORRESPONDING CHARACTERS
 keywords = [chr(c) for c in range(ord('a'), ord('z')+1)]
 cap = ['A', 'B', 'D', 'E', 'F', 'G', 'H', 'I', 'L', 'M', 'N', 'Q', 'R', 'T']
 keywords = keywords + cap
 keywords = keywords + ['noise']
 
-X = 0
-Y = 1
-POS = 1
-SHAPE = 2
-W = 0
-H = 1
+# SOME CONVENTION FOR BELOW FUNCTION DEFINATION
+X = 0   # X coordinate of the character in image space
+Y = 1   # Y coordinate of the character in image space
+POS = 1    # shows and return the (x,y) coordinate of image space
+SHAPE = 2  # shows and return the (width, height) of character contour in image space
+W = 0 # width of the character
+H = 1 # height of the character
 
+
+'''
+    "check_in(c, region)" checks if character is present in the given region
+    "region" of the image space
+'''
 def check_in(c, region):
     x, y, w, h = region
     center_x = c[POS][X]+c[SHAPE][W]/2
@@ -23,12 +29,20 @@ def check_in(c, region):
         return True
     return False
 
+
+'''
+    "get_region(c, regions)" finds the region in the given list of regions variable
+    "regions" in image space and return it
+'''
 def get_region(c, regions):
     for region in regions:
         if check_in(c, region):
           return region
     return False
 
+'''
+    "sort_chars(line)" Function to sort characters in given line
+'''
 def sort_chars(line):
   res = list()
   while len(line) > 0:
@@ -42,6 +56,11 @@ def sort_chars(line):
     res.append(m)
   return res
 
+
+'''
+    "sort_lines_by_yval(lines)" function sorts list of lines according to its
+    y coordinate in image space
+'''
 def sort_lines_by_yval(lines):
   res = list()
   while len(lines) > 0:
@@ -55,6 +74,10 @@ def sort_lines_by_yval(lines):
     res.append(m)
   return res
 
+
+'''
+"arrangeline(characters)" Function to group characters in given image by lines
+'''
 def group_chars_by_line(characters):
   lines = list()
   linei = 0
@@ -76,6 +99,10 @@ def group_chars_by_line(characters):
       characters.remove(m)
   return lines
 
+'''
+    "apply_ocr(img)" is the function that does actual ocr
+    operation on image parameter to get text
+'''
 def apply_ocr(img, text_detector):
     avg_h = 0
     character_list = list()

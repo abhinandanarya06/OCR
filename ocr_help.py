@@ -25,7 +25,7 @@ def check_in(c, region):
 
 def get_region(c, regions):
     for region in regions:
-        if check_in(char, region):
+        if check_in(c, region):
           return region
     return False
 

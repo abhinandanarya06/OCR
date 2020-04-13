@@ -2,6 +2,7 @@ import cv2
 import tensorflow as tf
 from ocr_help import *
 import os
+import numpy as np
 
 
 def imshow(image):

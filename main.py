@@ -4,6 +4,11 @@ from ocr_help import *
 import os
 
 
+def imshow(image):
+  plt.imshow(image, cmap = 'gray', interpolation = 'bicubic')
+  plt.xticks([]), plt.yticks([])  # to hide tick values on X and Y axis
+  plt.show()
+
 model = tf.keras.models.load_model('./model.h5')
 
 text_detector= tf.keras.Sequential(

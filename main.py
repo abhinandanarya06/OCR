@@ -1,7 +1,7 @@
 import cv2
 import tensorflow as tf
 from ocr_help import *
-
+import os
 
 
 model = tf.keras.models.load_model('./model.h5')

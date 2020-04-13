@@ -4,7 +4,8 @@ from ocr_help import *
 
 
 
-model = tf.keras.models.load_model('model.h5')
+model = tf.keras.models.load_model('./model.h5')
+
 text_detector= tf.keras.Sequential(
     model,
     tf.keras.layers.Softmax()

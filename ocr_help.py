@@ -81,7 +81,6 @@ def apply_ocr(img, text_detector):
     img[:,:]=0
     i = 0
     for c in contours:
-      try:
         x,y,w,h = cv2.boundingRect(c)
         try:
             show = color[y-2:y+h+2, x-2:x+w+2]
@@ -95,8 +94,6 @@ def apply_ocr(img, text_detector):
           cv2.rectangle(img, (x,y), (x+w+w//4, y+h), 255, -1)
           character_list.append([keywords[cmd], (x,y), (w,h)])
           i+= 1
-      except:
-            continue
     avg_h/=i
     text = group_chars_by_line(character_list)#, img)
     text = sort_lines_by_yval(text)

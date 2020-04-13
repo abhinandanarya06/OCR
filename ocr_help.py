@@ -81,12 +81,15 @@ def apply_ocr(img, text_detector):
     img[:,:]=0
     i = 0
     for c in contours:
+      try:
         x,y,w,h = cv2.boundingRect(c)
         try:
             show = color[y-2:y+h+2, x-2:x+w+2]
         except:
             show = color[y:y+h, x:x+w]
         test_data = cv2.resize(show,(50,50),interpolation = cv2.INTER_AREA)
+      except:
+            continue
         test_data=np.array([test_data])
         cmd = np.argmax(text_detector.predict(test_data))
         if cmd < 40:

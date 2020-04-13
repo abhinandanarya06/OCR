@@ -89,7 +89,7 @@ def apply_ocr(img, text_detector):
             show = color[y:y+h, x:x+w]
         test_data = cv2.resize(show,(50,50),interpolation = cv2.INTER_AREA)
       except:
-            continue
+        continue
         test_data=np.array([test_data])
         cmd = np.argmax(text_detector.predict(test_data))
         if cmd < 40:

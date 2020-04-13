@@ -1,3 +1,5 @@
+import cv2
+
 X = 0
 Y = 1
 POS = 1

@@ -65,7 +65,8 @@ def group_chars_by_line(characters):
       linei += 1
       characters.remove(m)
   return lines
-def apply_ocr(img):
+
+def apply_ocr(img, text_detector):
     avg_h = 0
     character_list = list()
     color = img
@@ -85,14 +86,12 @@ def apply_ocr(img):
             show = color[y:y+h, x:x+w]
         test_data = cv2.resize(show,(50,50),interpolation = cv2.INTER_AREA)
         test_data=np.array([test_data])
-        cmd = np.argmax(probablity.predict(test_data))
+        cmd = np.argmax(text_detector.predict(test_data))
         if cmd < 40:
           avg_h += h
           cv2.rectangle(img, (x,y), (x+w+w//4, y+h), 255, -1)
           character_list.append([keywords[cmd], (x,y), (w,h)])
           i+= 1
-        #cv2.imwrite('gen/'+keywords[cmd]+'/'+str(i)+'.jpg', show)
-        #i+=1
       except:
             continue
     avg_h/=i

@@ -14,7 +14,7 @@ text_detector= tf.keras.Sequential(
 )
 
 ## GETTING IMAGE FILE FROM CURRENT DIRECTORY
-test_images_path = 'OCR/sample_test_image/'
+test_images_path = 'sample_test_image/'
 imgs = [f for f in os.listdir(test_images_path) if f.endswith('.jpg')]
 img_no = 0
 

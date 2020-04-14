@@ -89,19 +89,23 @@ data_images = list()
 labels = list()
 i = 0
 for c in keywords:
-  path = 'OCR/data/{}/'.format(c) # IF YOU WANT TO GET DATA FROM OTHER PATH,
-  files = os.listdir(path)        # THEN PLEASE MODIFY "path" VARIABLE ACCORDINGLY
-  for name in files:
-      img = cv2.imread(path+name)
-      try:
-        img = cv2.resize(img, (50, 50), interpolation = cv2.INTER_AREA)
-      except:
-        continue
-      data_images.append(img)
-      labels.append(i)
-  i += 1
+    path = 'OCR/data/{}/'.format(c) # IF YOU WANT TO GET DATA FROM OTHER PATH,
+    files = os.listdir(path)        # THEN PLEASE MODIFY "path" VARIABLE ACCORDINGLY
+    for name in files:
+        img = cv2.imread(path+name, 0)
+        try:
+            img = cv2.resize(img, (30, 30), interpolation = cv2.INTER_AREA)
+        except:
+            continue
+        data_images.append(img)
+        labels.append(i)
+    i += 1
 
 data_images = np.array(data_images)
+
+IMAGE_DATA_SHAPE = (data_images.shape[0], 30, 30, 1)
+
+data_images = data_images.reshape(IMAGE_DATA_SHAPE)
 labels = np.array(labels)
 
 print(labels.shape, data_images.shape)
@@ -123,7 +127,7 @@ Layer Sequence (Sequencial Model) :
 """
 
 model = tf.keras.Sequential([
-    tf.keras.layers.Conv2D(32, (3, 3), activation='relu', input_shape = (50, 50, 3)),
+    tf.keras.layers.Conv2D(8, (5, 5), activation='relu', input_shape = (30, 30, 1)),
     tf.keras.layers.Flatten(),
     tf.keras.layers.Dense(200, activation = 'relu'),
     tf.keras.layers.Dropout(0.1),
@@ -215,38 +219,38 @@ def check_in(c, region):
 def get_region(c, regions):
     for region in regions:
         if check_in(c, region):
-          return region
+            return region
     return False
 
 """#####"***sort_chars(line)***" Function to sort characters in given line"""
 
 def sort_chars(line):
-  res = list()
-  while len(line) > 0:
-    mx = 100000
-    m = 0
-    for c in line:
-      if c[POS][X] <= mx:
-        mx = c[POS][X]
-        m = c
-    line.remove(m)
-    res.append(m)
-  return res
+    res = list()
+    while len(line) > 0:
+        mx = 100000
+        m = 0
+        for c in line:
+            if c[POS][X] <= mx:
+                mx = c[POS][X]
+                m = c
+        line.remove(m)
+        res.append(m)
+    return res
 
 """#####"***sort_lines_by_yval(lines)***" function sorts list of lines according to its y coordinate in image space"""
 
 def sort_lines_by_yval(lines):
-  res = list()
-  while len(lines) > 0:
-    mn = 100000
-    m = 0
-    for line in lines:
-      if line[0][POS][Y] < mn:
-        mn = line[0][POS][Y]
-        m = line
-    lines.remove(m)
-    res.append(m)
-  return res
+    res = list()
+    while len(lines) > 0:
+        mn = 100000
+        m = 0
+        for line in lines:
+            if line[0][POS][Y] < mn:
+              mn = line[0][POS][Y]
+              m = line
+        lines.remove(m)
+        res.append(m)
+    return res
 
 """#####"***arrangeline(characters)***" Function to group characters in given image by lines"""
 
@@ -261,9 +265,9 @@ def group_chars_by_line(characters):
       for c in characters[1:]:
           if my <= c[POS][Y]+c[SHAPE][H]/2 and c[POS][Y]+c[SHAPE][H]/2 <= my_plus_h:
               if my > c[POS][Y]:
-                my = c[POS][Y]
+                  my = c[POS][Y]
               if my_plus_h < c[POS][Y]+c[SHAPE][H]:
-                my_plus_h = c[POS][Y]+c[SHAPE][H]
+                  my_plus_h = c[POS][Y]+c[SHAPE][H]
               lines[linei].append(c)
               characters.remove(c)
       lines[linei]= sort_chars(lines[linei])
@@ -274,59 +278,58 @@ def group_chars_by_line(characters):
 """#####"***apply_ocr(img)***" is the function that does actual ocr operation on image parameter to get text"""
 
 def apply_ocr(img, text_detector):
-    avg_h = 0
-    character_list = list()
-    color = img
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    avg_text_height = 0 # will be assigned with Average Height of text character
+    character_list = list() # will contain necessary text character to be extracted
     img = cv2.medianBlur(img,5)
     img = cv2.adaptiveThreshold(img,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,\
-            cv2.THRESH_BINARY,21,10)
+            cv2.THRESH_BINARY,21,10) # will remove maximum noise and make image suitable for contour dt
     contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-    img[:,:]=0
+    black_map = img.copy()
+    black_map[:, :] = 0
     i = 0
-    for c in contours:
-      try:
-        x,y,w,h = cv2.boundingRect(c)
+    for contour in contours:
         try:
-            show = color[y-2:y+h+2, x-2:x+w+2]
+            x,y,w,h = cv2.boundingRect(contour)
+            try:
+                cnt = img[y-2:y+h+2, x-2:x+w+2]
+            except:
+                cnt = img[y:y+h, x:x+w]
+            cnt = cv2.resize(cnt, (30, 30), interpolation = cv2.INTER_AREA)
+            cnt = cnt.reshape((1, 30, 30, 1))
+            class_pred = np.argmax(text_detector.predict(cnt))
+            if class_pred < 40:
+                avg_text_height += h
+                cv2.rectangle(black_map, (x,y), (x+w+w//4, y+h), 255, -1)
+                character_list.append([keywords[class_pred], (x,y), (w,h)])
+                i += 1
         except:
-            show = color[y:y+h, x:x+w]
-        test_data = cv2.resize(show,(50,50),interpolation = cv2.INTER_AREA)
-        test_data=np.array([test_data])
-        cmd = np.argmax(text_detector.predict(test_data))
-        if cmd < 40:
-          avg_h += h
-          cv2.rectangle(img, (x,y), (x+w+w//4, y+h), 255, -1)
-          character_list.append([keywords[cmd], (x,y), (w,h)])
-          i+= 1
-      except:
-            continue
-    avg_h/=i
-    text = group_chars_by_line(character_list)#, img)
+              continue
+    avg_text_height /= i # Average Height of text character
+    text = group_chars_by_line(character_list)
     text = sort_lines_by_yval(text)
-    contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
-    regions = list()
-    for cnt in contours:
-      region = cv2.boundingRect(cnt)
-      if region[3] <= avg_h*7:
-        regions.append(region)
+    contours, hierarchy = cv2.findContours(black_map, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    regions = list() # will contain regions of words for grouping chars by word
+    for contour in contours:
+        region = cv2.boundingRect(contour)
+        if region[SHAPE + H] <= avg_text_height*7:
+          regions.append(region)
     del contours
 
     TEXT = ''
     for l in text:
-      char = l[0]
-      region = get_region(char, regions)
-      if not region:
-        continue
-      for char in l:
-        if not check_in(char, region):
-          TEXT = TEXT + ' '
-          r = get_region(char, regions)
-          if not r:
+        char = l[0]
+        region = get_region(char, regions)
+        if not region:
             continue
-          region = r
-        TEXT = TEXT + char[0]
-      TEXT = TEXT + '\n'
+        for char in l:
+            if not check_in(char, region):
+                TEXT = TEXT + ' '
+                r = get_region(char, regions)
+                if not r:
+                    continue
+                region = r
+            TEXT = TEXT + char[0]
+        TEXT = TEXT + '\n'
     return TEXT
 
 """#####**Main Run Start Point**
@@ -340,15 +343,15 @@ def apply_ocr(img, text_detector):
 * If not, please modify the path variable
 """
 
-test_images_path = '.' # IF YOU PLACE TEST IMAGE INSIDE OCR DIRECTORY,
-                       # THEN PLEASE MODIFY "test_images_path" variable
+test_images_path = 'OCR/sample_test_image/' # IF YOU PLACE TEST IMAGE INSIDE OCR DIRECTORY,
+                                            # THEN PLEASE MODIFY "test_images_path" variable
 
 
 imgs = [f for f in os.listdir(test_images_path) if f.endswith('.jpg')]
 img_no = 0
 for img in imgs:
     print('*'*30, 'Text on {}'.format(img), '*'*30)
-    img = cv2.imread(img)
+    img = cv2.imread(test_images_path + img, 0)
     TEXT = apply_ocr(img, text_detector)
     imshow(img)
     print(TEXT)

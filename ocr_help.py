@@ -75,14 +75,14 @@ Approach: Selection Sort
     '''
     res = list()
     while len(lines) > 0:
-    mn = 100000
-    m = 0
-    for line in lines:
-        if line[0][POS][Y] < mn:
-            mn = line[0][POS][Y]
-            m = line
-    lines.remove(m)
-    res.append(m)
+        mn = 100000
+        m = 0
+        for line in lines:
+            if line[0][POS][Y] < mn:
+                mn = line[0][POS][Y]
+                m = line
+        lines.remove(m)
+        res.append(m)
     return res
 
 
@@ -108,9 +108,9 @@ Approach: Linear Search for each line
                     my_plus_h = c[POS][Y]+c[SHAPE][H]
                 lines[linei].append(c)
                 characters.remove(c)
-      lines[linei]= sort_chars(lines[linei])
-      linei += 1
-      characters.remove(m)
+        lines[linei]= sort_chars(lines[linei])
+        linei += 1
+        characters.remove(m)
     return lines
 
 '''
@@ -118,17 +118,11 @@ Approach: Linear Search for each line
     operation on image parameter to get text
 '''
 def apply_ocr(img, text_detector):
-    '''
-Purpose: Apply OCR operation to extract text from given image
-Input  : 1) "img" image given from which text to be extracted
-         2) "text_detector" model which identifies the text on image
-Output : "TEXT" string text which will extracted from the "img" image
-    '''
     avg_text_height = 0 # will be assigned with Average Height of text character
     character_list = list() # will contain necessary text character to be extracted
     img = cv2.medianBlur(img,5)
     img = cv2.adaptiveThreshold(img,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,\
-            cv2.THRESH_BINARY,21,10) # will remove maximum noise and make image suitable for contour dt
+            cv2.THRESH_BINARY,41,10) # will remove maximum noise and make image suitable for contour dt
     contours, hierarchy = cv2.findContours(img,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
     black_map = img.copy()
     black_map[:, :] = 0
@@ -142,10 +136,11 @@ Output : "TEXT" string text which will extracted from the "img" image
                 cnt = img[y:y+h, x:x+w]
             cnt = cv2.resize(cnt, (30, 30), interpolation = cv2.INTER_AREA)
             cnt = cnt.reshape((1, 30, 30, 1))
+            cnt = cnt / np.max(cnt.reshape(900))
             class_pred = np.argmax(text_detector.predict(cnt))
             if class_pred < 40:
                 avg_text_height += h
-                cv2.rectangle(black_map, (x,y), (x+w+w//4, y+h), 255, -1)
+                cv2.rectangle(black_map, (x-w//7,y), (x+w+w//7, y+h), 255, -1)
                 character_list.append([keywords[class_pred], (x,y), (w,h)])
                 i += 1
         except:

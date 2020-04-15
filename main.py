@@ -21,7 +21,7 @@ img_no = 0
 ## APPLYING OCR ON EVERY IMAGE FILE AND SHOWING RESULTS
 for img in imgs:
     print('*'*30, 'Text on {}'.format(img), '*'*30)
-    img = cv2.imread(img)
+    img = cv2.imread(test_images_path + img, 0)
     TEXT = apply_ocr(img, text_detector)
     cv2.imshow('window', img)
     print(TEXT)

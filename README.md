@@ -1,6 +1,5 @@
 # OCR Research Project
-###### using OpenCV and Tensorflow
-
+![OCR Research Project](https://github.com/abhinandanarya06/OCR/blob/master/.res/OCR%20Research%20Project.jpg)
 ## Prerequisites
 1. [Python 3.7.4](https://www.python.org/) Installed 
 2. [OpenCV Python](https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_tutorials.html) - Image Processing Library
@@ -24,21 +23,24 @@ cd OCR/
 5. run main.py
 ```
 python main.py
+
+     OR
+
+python3 main.py
 ```
 
 ## Project Directory Overview
 - OCR 
-     - **data** contains others data directories of images of corresponding letters and common noise
+     - **[data](https://github.com/abhinandanarya06/OCR/tree/master/data)** contains others data directories of images of corresponding letters and common noise
          - **a**
          - **b**
          - :
          - :
          - **noise**
-     - **main.py** is main start point of running the python project
-     - **ocr_help.py** is OCR library that should be imported (imported in main.py) to use OCR functions
-     - **model.h5** is the tensorflow model which is to be used by **main.py**
-     - **Research Notebook on OCR.pynb** is the notebook to understand how this OCR Project works
-     - **research_notebook_on_ocr.py** is just python file version of above mentioned notebook that can be run instead of the notebook
+     - **[main.py](https://github.com/abhinandanarya06/OCR/blob/master/main.py)** is main start point of running the python project
+     - **[ocr_help.py](https://github.com/abhinandanarya06/OCR/blob/master/ocr_help.py)** is OCR library that should be imported (imported in main.py) to use OCR functions
+     - **[model.h5](https://github.com/abhinandanarya06/OCR/blob/master/model.h5)** is the tensorflow model which is to be used by **main.py**
+     - **[Research Notebook on OCR.pynb](https://colab.research.google.com/github/abhinandanarya06/OCR/blob/master/Research_Notebook_on_OCR.ipynb)** is the notebook to understand how this OCR Project works
 
 ## Issues
 1. Might not work on image having light colored text on dark background.
@@ -52,9 +54,8 @@ You will find there is some Issues. Issues indicated by me are Wrong Text Identi
 Hence this project is still in development and i am trying my best to minimise these issues.
 
 
-* If you have an idea to tackle these issues, I incourage you to contribute to this research project. 
-* If you find new issue, then post it on issue tab.
+* **Contribute** : If you have an idea to tackle these issues, I incourage you to contribute to this research project. You can use the dataset stored in data directory of the repository. 
+* **Support** : If you find new issue, please let me know.
 
-You can use the dataset stored in data directory of the repository.
 
 ### *Happy Learning !*

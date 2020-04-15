@@ -56,6 +56,6 @@ Hence this project is still in development and i am trying my best to minimise t
 
 * **Contribute** : If you have an idea to tackle these issues, I incourage you to contribute to this research project. You can use the dataset stored in data directory of the repository. 
 * **Support** : If you find new issue, please let me know.
-
+* **License** : This project is licensed under MIT
 
 ### *Happy Learning !*

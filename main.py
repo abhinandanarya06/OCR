@@ -15,7 +15,7 @@ text_detector= tf.keras.Sequential(
 
 ## GETTING IMAGE FILE FROM CURRENT DIRECTORY
 test_images_path = 'sample_test_image/'
-imgs = [f for f in os.listdir(test_images_path) if f.endswith('.jpg')]
+imgs = [f for f in os.listdir(test_images_path)]
 img_no = 0
 
 ## APPLYING OCR ON EVERY IMAGE FILE AND SHOWING RESULTS
@@ -23,7 +23,6 @@ for img in imgs:
     print('*'*30, 'Text on {}'.format(img), '*'*30)
     img = cv2.imread(test_images_path + img, 0)
     TEXT = apply_ocr(img, text_detector)
-    cv2.imshow('window', img)
     print(TEXT)
     print('-'*80, '\n\n')
     img_no += 1

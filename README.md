@@ -3,7 +3,12 @@
 ## Prerequisites
 1. [Python 3.7.4](https://www.python.org/) Installed 
 2. [OpenCV Python](https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_tutorials.html) - Image Processing Library
-3. [Tensorflow 2.0](https://www.tensorflow.org/install) - Machine learning Library
+3. [Tensorflow version 2.O Recommended](https://www.tensorflow.org/install) - Machine learning Library
+```
+pip install tensorflow==2.0rc1
+            OR
+pip3 install tensorflow==2.0rc1
+```
 
 ## Assumption
 1. The image given to the OCR program must have text place in approximately perfect horizontal line.
@@ -50,7 +55,7 @@ python3 main.py
 
 ## Important Message
 This project is just research on OCR. From Reading and running the Research Notebook,
-You will find there is some Issues. Issues indicated by me are Wrong Text Identification by the model and others mentioned in **Assumption** and **Issues** Section.
+You will find there is some Issues. Issues indicated by me are mentioned in **Assumption** and **Issues** Section.
 Hence this project is still in development and i am trying my best to minimise these issues.
 
 

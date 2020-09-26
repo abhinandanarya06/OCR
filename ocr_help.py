@@ -53,17 +53,7 @@ Input   : "line" list of characters
 Output  : "res" sorted list of characters
 Approach: Selection Sort
     '''
-    res = list()
-    while len(line) > 0:
-        mx = 100000
-        m = 0
-        for c in line:
-            if c[POS][X] <= mx:
-                mx = c[POS][X]
-                m = c
-        line.remove(m)
-        res.append(m)
-    return res
+    return sorted(line, key=lambda c: c[POS][X])
 
 
 def sort_lines_by_yval(lines):
@@ -73,17 +63,7 @@ Input   : "lines" list of lines
 Output  : "res" sorted list of lines
 Approach: Selection Sort
     '''
-    res = list()
-    while len(lines) > 0:
-        mn = 100000
-        m = 0
-        for line in lines:
-            if line[0][POS][Y] < mn:
-                mn = line[0][POS][Y]
-                m = line
-        lines.remove(m)
-        res.append(m)
-    return res
+    return sorted(lines, key=lambda line: line[0][POS][Y])
 
 
 def group_chars_by_line(characters):

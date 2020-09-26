@@ -7,12 +7,6 @@ import numpy as np
 ## LOADING MODEL IN CURRENT DIRECTORY NAMED model.h5 FILE
 model = tf.keras.models.load_model('model.h5')
 
-## ADDING SOFTMAX ACTIVATION
-text_detector= tf.keras.Sequential(
-    model,
-    tf.keras.layers.Softmax()
-)
-
 ## GETTING IMAGE FILE FROM CURRENT DIRECTORY
 test_images_path = 'sample_test_image/'
 imgs = [f for f in os.listdir(test_images_path)]
@@ -22,7 +16,7 @@ img_no = 0
 for img in imgs:
     print('*'*30, 'Text on {}'.format(img), '*'*30)
     img = cv2.imread(test_images_path + img, 0)
-    TEXT = apply_ocr(img, text_detector)
+    TEXT = apply_ocr(img, model)
     print(TEXT)
     print('-'*80, '\n\n')
     img_no += 1
